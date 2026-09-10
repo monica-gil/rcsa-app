@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RCSA | Datos de entrada</title>
+  <style>
+    :root { color-scheme: light dark; --bg: light-dark(#f4f6f8, #14181d); --surface: light-dark(#ffffff, #1d232b); --text: light-dark(#1b2634, #e7edf5); --muted: light-dark(#657384, #aab6c5); --line: light-dark(#d8e0e8, #384554); --accent: light-dark(#0b6f9b, #62c5f2); --accent-text: #fff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, sans-serif; }
+    main { max-width: 1280px; margin: auto; padding: 28px 20px 44px; }
+    h1 { margin: 0; font-size: 1.6rem; }
+    .intro { color: var(--muted); margin: 4px 0 24px; }
+    .layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr); gap: 24px; align-items: start; }
+    form, .plot-area { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+    form { padding: 12px; }
+    details { border-bottom: 1px solid var(--line); }
+    details:last-of-type { border-bottom: 0; }
+    summary { cursor: pointer; padding: 12px 6px; font-weight: 650; }
+    .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 2px 6px 16px; }
+    label { display: grid; gap: 4px; color: var(--muted); font-size: .86rem; }
+    input { min-width: 0; width: 100%; padding: 8px 9px; border: 1px solid var(--line); border-radius: 5px; background: var(--bg); color: var(--text); font: inherit; }
+    .wide { grid-column: 1 / -1; }
+    .actions { display: flex; gap: 10px; padding: 16px 6px 4px; }
+    button { border: 1px solid var(--accent); border-radius: 5px; padding: 9px 13px; cursor: pointer; font: inherit; }
+    button[type="submit"] { background: var(--accent); color: var(--accent-text); }
+    button[type="reset"] { background: transparent; color: var(--text); }
+    .plot-area { padding: 18px; position: sticky; top: 18px; }
+    h2 { font-size: 1.1rem; margin: 0 0 4px; }
+    .status { color: var(--muted); min-height: 1.5em; margin: 0 0 14px; }
+    svg { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 5px; background: var(--bg); }
+    .axis, .grid { stroke: var(--line); stroke-width: 1; }
+    .axis { stroke: var(--text); }
+    svg text { fill: var(--muted); font: 12px system-ui, sans-serif; }
+    @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } .plot-area { position: static; } }
+    @media (max-width: 520px) { .fields { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>RCSA · Configuración del modelo</h1>
+    <p class="intro">Maqueta de entrada de datos. Los valores se expresan en mm donde se indica; los vectores pueden separarse con espacios.</p>
+    <div class="layout">
+      <form id="rcsa-form">
+        <details open>
+          <summary>Archivo experimental y material</summary>
+          <div class="fields">
+            <label class="wide">Archivo MAT (IRCSA experimental)<input name="filename" value="FRFs_IRCS.mat"></label>
+            <label>Módulo de Young, E (Pa)<input name="steelE" value="2.068e11"></label>
+            <label>Densidad, Rho (kg/m³)<input name="steelRho" value="7820"></label>
+            <label>Coeficiente de Poisson, Nu (-)<input name="steelNu" value="0.29"></label>
+          </div>
+        </details>
+        <details>
+          <summary>LongBarData · Barra para IRCSA</summary>
+          <div class="fields">
+            <label>Longitudes de sección (mm, vector)<input name="longLength" value="405"></label>
+            <label>Diámetros exteriores (mm, vector)<input name="longDiamExt" value="62.8"></label>
+            <label>Número de elementos (vector)<input name="longNElem" value="20"></label>
+            <label>Diámetro interior (mm)<input name="longDiamInt" value="18"></label>
+            <label>Amortiguamiento relativo, Psi (%)<input name="longPsi" value="0.1"></label>
+          </div>
+        </details>
+        <details>
+          <summary>InputIRCSA y EvaluateIRCSA</summary>
+          <div class="fields">
+            <label>Frecuencia mínima (Hz)<input name="ircsaFreqMin" value="0"></label>
+            <label>Frecuencia máxima (Hz)<input name="ircsaFreqMax" value="1600"></label>
+            <label>Incremento de frecuencia (Hz)<input name="ircsaDeltaFreq" value="0.1"></label>
+            <label>Convención de signo (0/1)<input name="signIRCSA" value="0"></label>
+            <label>Nodo P1<input name="ircsaNodeP1" value="1"></label>
+            <label>DoF P1<input name="ircsaDoFP1" value="3"></label>
+            <label>Nodo P2<input name="ircsaNodeP2" value="21"></label>
+            <label>DoF P2<input name="ircsaDoFP2" value="3"></label>
+          </div>
+        </details>
+        <details>
+          <summary>ToolData · Herramienta</summary>
+          <div class="fields">
+            <label>Longitudes de sección (mm, vector)<input name="toolLength" value="448.6"></label>
+            <label>Diámetros exteriores (mm, vector)<input name="toolDiamExt" value="62.8"></label>
+            <label>Número de elementos (vector)<input name="toolNElem" value="32"></label>
+            <label>Diámetro interior (mm)<input name="toolDiamInt" value="18"></label>
+            <label>Amortiguamiento relativo, Psi (%)<input name="toolPsi" value="1"></label>
+          </div>
+        </details>
+        <details>
+          <summary>HeadData · Cabezal</summary>
+          <div class="fields">
+            <label>Masa (kg)<input name="headMass" value="4"></label>
+            <label>Longitud (mm)<input name="headLength" value="43.6"></label>
+            <label>Desplazamiento del centro de gravedad (mm)<input name="headCoGOffset" value="21.8"></label>
+            <label>Diámetro (mm)<input name="headDiam" value="62.8"></label>
+            <label>Número de elementos<input name="headNElem" value="2"></label>
+            <label>Densidad (kg/m³)<input name="headRho" value="7.82"></label>
+            <label>Módulo de Young (Pa)<input name="headE" value="2.2e11"></label>
+            <label>Coeficiente de Poisson (-)<input name="headNu" value="0.29"></label>
+          </div>
+        </details>
+        <details>
+          <summary>Evaluación de herramienta, restricciones y resultados</summary>
+          <div class="fields">
+            <label>Nodo P1 de la herramienta<input name="toolNodeP1" value="3"></label>
+            <label>DoF P1 de la herramienta<input name="toolDoFP1" value="3"></label>
+            <label>Nodo P2 de la herramienta<input name="toolNodeP2" value="35"></label>
+            <label>DoF P2 de la herramienta<input name="toolDoFP2" value="3"></label>
+            <label>Frecuencia mínima restringida (Hz)<input name="restrainFreqMin" value="0"></label>
+            <label>Frecuencia máxima restringida (Hz)<input name="restrainFreqMax" value="1600"></label>
+            <label>Incremento restringido (Hz)<input name="restrainDeltaFreq" value="0.1"></label>
+            <label>Nodos restringidos (vector)<input name="restrainNodes" value="3 0"></label>
+            <label>DoFs restringidos (vector)<input name="restrainDofs" value="3 3"></label>
+            <label>Frecuencia inicial de búsqueda (Hz)<input name="resultFreqIni" value="20"></label>
+            <label>Ancho de banda (Hz)<input name="resultBandWidth" value="20"></label>
+          </div>
+        </details>
+        <div class="actions">
+          <button type="submit">Preparar cálculo</button>
+          <button type="reset">Restablecer valores</button>
+        </div>
+      </form>
+      <section class="plot-area" aria-labelledby="plot-title">
+        <h2 id="plot-title">Figura de resultados</h2>
+        <p id="status" class="status" aria-live="polite">Pendiente de conectar con el cálculo MATLAB.</p>
+        <svg viewBox="0 0 520 330" role="img" aria-label="Área reservada para la figura RCSA">
+          <line class="grid" x1="70" y1="70" x2="490" y2="70"/><line class="grid" x1="70" y1="130" x2="490" y2="130"/><line class="grid" x1="70" y1="190" x2="490" y2="190"/>
+          <line class="axis" x1="70" y1="270" x2="490" y2="270"/><line class="axis" x1="70" y1="35" x2="70" y2="270"/>
+          <text x="245" y="315">Frecuencia (Hz)</text><text x="20" y="165" transform="rotate(-90 20 165)">Amplitud (m/N)</text>
+          <text x="178" y="155">Figura RCSA pendiente</text>
+        </svg>
+      </section>
+    </div>
+  </main>
+  <script>
+    document.getElementById('rcsa-form').addEventListener('submit', (event) => {
+      event.preventDefault();
+      document.getElementById('status').textContent = 'Datos preparados. La conexión con MATLAB se añadirá en una fase posterior.';
+    });
+  </script>
+</body>
+</html>
