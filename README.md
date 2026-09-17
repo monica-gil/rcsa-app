@@ -1,2 +1,8 @@
-# rcsa-app
-RCSA Application
+# RCSA
+
+Código MATLAB para el análisis de subestructuras mediante receptancias (RCSA).
+
+## Tareas pendientes
+
+- [ ] Implementar RCSA para el cálculo de la rigidez estática.
+- [ ] Añadir optimización al código.
