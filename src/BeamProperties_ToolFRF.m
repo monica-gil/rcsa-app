@@ -51,7 +51,7 @@ ToolSection.Kappa = NaN(1,NSection);
 for idxSection = 1:NSection
     ToolSection.Inertia(idxSection) = pi*(DiamExt(idxSection)^4-DiamInt^4)/64; % Inertia of the boring bar
     ToolSection.Area(idxSection) = pi*(DiamExt(idxSection)^2-DiamInt^2)/4; % Area of the boring bar
-    ToolSection.Kappa(idxSection) = (6*(1+ToolNu)*(1+(DiamInt/DiamExt(idxSection))^2)^2)/((7+6*ToolNu)*(1+(DiamInt/DiamExt(idxSection))^2)^2+(20+12*ToolNu)*(DiamInt/DiamExt(idxSection))^2);
+    ToolSection.Kappa(idxSection) = (6*(1+ToolNu(idxSection))*(1+(DiamInt/DiamExt(idxSection))^2)^2)/((7+6*ToolNu(idxSection))*(1+(DiamInt/DiamExt(idxSection))^2)^2+(20+12*ToolNu(idxSection))*(DiamInt/DiamExt(idxSection))^2);
 end
 
 % Grinding head

@@ -105,12 +105,12 @@ Steel.Nu = 0.29; % (-)
 
 %% Input Parameters | IRCSA
 % Folder = '';
-Filename = 'FRFs_IRCS_DIRY.mat';
+Filename = 'FRFs_IRCSA_PortaGrande_X.mat';
 
 % LongBarData section: [section 1,  section 2, ...]
-LongBarData.Length = 405*1e-3; % [268 16.5 16.5]*1e-03; % (m) % Length of the bar employed for IRCSA
-LongBarData.DiamExt = 62.8*1e-3; % [58 31.75 12]*10^-3; % (m) % Diameter of the bar employed for IRCSA
-LongBarData.DiamInt = 18*1e-3; % 5*10^-3; % (m)
+LongBarData.Length = (240-40)*1e-3; % [268 16.5 16.5]*1e-03; % (m) % Length of the bar employed for IRCSA
+LongBarData.DiamExt = 50*1e-3; % [58 31.75 12]*10^-3; % (m) % Diameter of the bar employed for IRCSA
+LongBarData.DiamInt = 5*1e-3; % 5*10^-3; % (m)
 LongBarData.NElem = 20;
 % RCSA information
 LongBarData.Psi = 0.1;
@@ -133,7 +133,7 @@ EvaluateIRCSA.DoFP2 = 3; % 3rd dof of NodeP2
 
 % Frequency range for the FRF
 InputToolRestrain.FreqMin = 0; % (Hz)
-InputToolRestrain.FreqMax = 400; % (Hz)
+InputToolRestrain.FreqMax = 12000; % (Hz)
 InputToolRestrain.DeltaFreq = 0.1; % (Hz) precision
 
 Result.FreqIni = 20; % (Hz)
@@ -141,23 +141,23 @@ Result.BandWidth = 20; % (Hz)
 
 %% Input Data | ToolData
 % ToolData sections: [section1 section2, ....]
-ToolData.Length = 405*1e-03; % [105.5 12.5 20]; [93 10 20]*1e-03; % (m)
-ToolData.DiamExt = 62.8*1e-03; %  [63 41.5 20]; [63 45 30]*1e-03; % (m)
-ToolData.DiamInt = 18e-03; % (m) % internal hole
-ToolData.NElem = 32;
+ToolData.Length = [80 26]*1e-03; % [105.5 12.5 20]; [93 10 20]*1e-03; % (m)
+ToolData.DiamExt = [50 50]*1e-03; %  [63 41.5 20]; [63 45 30]*1e-03; % (m)
+ToolData.DiamInt = 15e-03; % (m) % internal hole
+ToolData.NElem = [32 2];
 
 % Bar damping
-ToolData.Psi = 1; % 0.1; % Relative damping percentage of the integral boring bar
+ToolData.Psi = 0.1; % 0.1; % Relative damping percentage of the integral boring bar
 % Material
-ToolData.Rho = Steel.Rho;
-ToolData.E = Steel.E;
-ToolData.Nu = Steel.Nu;
+ToolData.Rho = [15630 18800]; %(kg/m^3)
+ToolData.E = [700 385]*1*10^9; %(Pa)
+ToolData.Nu = [0.22 0.29];
 
 % Grinding wheel mass
-HeadData.Mass = 7.118; % 0.05; 0.11(kg)
-HeadData.Length = 2*21.8*1e-3; % 30; 20(m)
-HeadData.CoGOffset = 21.8*1e-3; % HeadData.Length/2; % 10*1e-3; %% (m)
-HeadData.Diam = ToolData.DiamExt; % (m)
+HeadData.Mass = 0; % 0.05; 0.11(kg)
+HeadData.Length = 30*1e-3; % 30; 20(m)
+HeadData.CoGOffset = HeadData.Length/2; % HeadData.Length/2; % 10*1e-3; %% (m)
+HeadData.Diam = 80*1e-03; % (m)
 HeadData.NElem = 2; % Fix value. Don't modify
 % HeadData mass and properties
 HeadData.Rho = 7820*10^-3; % (kg/m^3)
@@ -178,8 +178,8 @@ NumDoFNode = 3; % (fixed) number of degree of freedom in each node
 
 %% Input Results
 % figure axes limits
-FigOpts.Xlim = [30 2000];
-FigOpts.Ylim = [0 8e-7];
+FigOpts.Xlim = [30 12000];
+FigOpts.Ylim = [0 5e-7];
 
 %% Calculate Other Data
 % IRCSA | Long bar

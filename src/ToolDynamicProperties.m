@@ -5,6 +5,7 @@ function ToolModel = ToolDynamicProperties(ToolData,HeadData)
 % The head is modelled with a mass element
 
 %% Variable Information
+
 % ToolData: structure containing the tool finite-element model data.
 %   * DiamExt (m): outer diameter of each tool section.
 %   * DiamInt (m): inner diameter common to all tool sections.
@@ -31,6 +32,11 @@ function ToolModel = ToolDynamicProperties(ToolData,HeadData)
 %   * C (N*s/m): assembled damping matrix.
 
 %% Input Data
+NumToolSect = length(ToolData.Length);
+idxSectElem = [repmat(0,1,HeadData.NElem) NumToolSect];
+for idx = NumToolSect:-1:1
+    idxSectElem = [idxSectElem repmat(idx,1,ToolData.NElem(idx))];
+end
 
 %% Main
 % Beam properties vector
@@ -45,10 +51,11 @@ for idxElem = 1:ToolData.NElemTotal
         E = HeadData.E; % tool head elements
         Rho = HeadData.Rho; % tool head elements
         Nu = HeadData.Nu; % tool head elements
-    else
-        E = ToolData.E; % tool elements
-        Rho = ToolData.Rho; % tool elements
-        Nu = ToolData.Nu; % tool elements
+    else 
+        idxSectOn = idxSectElem(idxElem);
+        E = ToolData.E(idxSectOn); % tool elements
+        Rho = ToolData.Rho(idxSectOn); % tool elements
+        Nu = ToolData.Nu(idxSectOn); % tool elements
     end
     ElemArea = ToolHeadArea(idxElem);
     ElemInertia = ToolHeadInertia(idxElem);
