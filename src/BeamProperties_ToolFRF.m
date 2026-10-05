@@ -33,11 +33,13 @@ NElem = ToolData.NElem;
 ToolNu = ToolData.Nu;
 
 % Grinding tool head
-DiamHead = HeadData.Diam;
-LengthHead = HeadData.Length;
-CoGOffset = HeadData.CoGOffset;
-NElemHead = HeadData.NElem;
-HeadNu = HeadData.Nu;
+if HeadData.Active
+    DiamHead = HeadData.Diam;
+    LengthHead = HeadData.Length;
+    CoGOffset = HeadData.CoGOffset;
+    NElemHead = HeadData.NElem;
+    HeadNu = HeadData.Nu;
+end
 
 %% Other Input Data
 NSection = length(DiamExt);
@@ -54,17 +56,24 @@ for idxSection = 1:NSection
     ToolSection.Kappa(idxSection) = (6*(1+ToolNu(idxSection))*(1+(DiamInt/DiamExt(idxSection))^2)^2)/((7+6*ToolNu(idxSection))*(1+(DiamInt/DiamExt(idxSection))^2)^2+(20+12*ToolNu(idxSection))*(DiamInt/DiamExt(idxSection))^2);
 end
 
-% Grinding head
-HeadData.Inertia = pi*DiamHead^4/64; % Inertia of the beams employed in the toolhead
-HeadData.Area = pi*(DiamHead^2)/4; % Area of the beams employed in the toolhead
-HeadData.Kappa = (6*(1+HeadNu))/(7+6*HeadNu); % Shear coefficient of the beams employed in the toolhead
+if HeadData.Active
+    % Grinding head
+    HeadData.Inertia = pi*DiamHead^4/64; % Inertia of the beams employed in the toolhead
+    HeadData.Area = pi*(DiamHead^2)/4; % Area of the beams employed in the toolhead
+    HeadData.Kappa = (6*(1+HeadNu))/(7+6*HeadNu); % Shear coefficient of the beams employed in the toolhead
 
-% Fill the vectors of the tool head
-ToolAndHead.Length = repmat((LengthHead-CoGOffset)/(NElemHead-1),NElemHead,1);
-ToolAndHead.Length(end,1) = CoGOffset;
-ToolAndHead.Area = repmat(HeadData.Area,NElemHead,1);
-ToolAndHead.Inertia = repmat(HeadData.Inertia,NElemHead,1);
-ToolAndHead.Kappa = repmat(HeadData.Kappa,NElemHead,1);
+    % Fill the vectors of the tool head
+    ToolAndHead.Length = repmat((LengthHead-CoGOffset)/(NElemHead-1),NElemHead,1);
+    ToolAndHead.Length(end,1) = CoGOffset;
+    ToolAndHead.Area = repmat(HeadData.Area,NElemHead,1);
+    ToolAndHead.Inertia = repmat(HeadData.Inertia,NElemHead,1);
+    ToolAndHead.Kappa = repmat(HeadData.Kappa,NElemHead,1);
+else
+    ToolAndHead.Length = [];
+    ToolAndHead.Area = [];
+    ToolAndHead.Inertia = [];
+    ToolAndHead.Kappa = [];
+end
 
 for idxSection = NSection:-1:1
     ToolAndHead.Length = [ToolAndHead.Length; repmat(ToolLength(idxSection)/NElem(idxSection),NElem(idxSection),1)]; % !!

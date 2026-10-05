@@ -33,6 +33,7 @@
 %   * Rho: density (kg/m^3)
 %   * Nu: Poisson coefficient (-)
 % HeadData: head of the tool modelled as COMN2 element (mass element)
+%   * Active: true/false | Include grinding wheel or not
 %   * Mass (kg)
 %   * Length (mm)
 %   * CoGOffset (mm): distance from the head end to its centre of gravity.
@@ -110,8 +111,8 @@ Filename = 'FRFs_IRCSA_PortaGrande_X.mat';
 % LongBarData section: [section 1,  section 2, ...]
 LongBarData.Length = (240-40)*1e-3; % [268 16.5 16.5]*1e-03; % (m) % Length of the bar employed for IRCSA
 LongBarData.DiamExt = 50*1e-3; % [58 31.75 12]*10^-3; % (m) % Diameter of the bar employed for IRCSA
-LongBarData.DiamInt = 5*1e-3; % 5*10^-3; % (m)
-LongBarData.NElem = 20;
+LongBarData.DiamInt = 0*1e-3; % 5*10^-3; % (m)
+LongBarData.NElem = 32;
 % RCSA information
 LongBarData.Psi = 0.1;
 % Material
@@ -121,7 +122,7 @@ LongBarData.Nu = 0.29;
 
 % Frequency range for IRCSA
 InputIRCSA.FreqMin = 0; % (Hz)
-InputIRCSA.FreqMax = 1600; % 2000; % (Hz)
+InputIRCSA.FreqMax = 3200; % 2000; % (Hz)
 InputIRCSA.DeltaFreq = 0.1; % (Hz) precision
 InputIRCSA.signIRCSA = 0; % Sign 0->Positive ; 1->Negative
 
@@ -141,20 +142,21 @@ Result.BandWidth = 20; % (Hz)
 
 %% Input Data | ToolData
 % ToolData sections: [section1 section2, ....]
-ToolData.Length = [80 26]*1e-03; % [105.5 12.5 20]; [93 10 20]*1e-03; % (m)
-ToolData.DiamExt = [50 50]*1e-03; %  [63 41.5 20]; [63 45 30]*1e-03; % (m)
-ToolData.DiamInt = 15e-03; % (m) % internal hole
-ToolData.NElem = [32 2];
+ToolData.Length = 170; % [80 26]*1e-03; % [105.5 12.5 20]; [93 10 20]*1e-03; % (m)
+ToolData.DiamExt = 29.5; % [50 50]*1e-03; %  [63 41.5 20]; [63 45 30]*1e-03; % (m)
+ToolData.DiamInt = 0; % 15e-03; % (m) % internal hole
+ToolData.NElem = 32; % [20 12];
 
 % Bar damping
 ToolData.Psi = 0.1; % 0.1; % Relative damping percentage of the integral boring bar
 % Material
-ToolData.Rho = [15630 18800]; %(kg/m^3)
-ToolData.E = [700 385]*1*10^9; %(Pa)
-ToolData.Nu = [0.22 0.29];
+ToolData.Rho = 17600; % [15630 18800]; %(kg/m^3)
+ToolData.E = 360*10^9; % [700 385]*10^9; %(Pa)
+ToolData.Nu = 0.29; % [0.22 0.29];
 
 % Grinding wheel mass
-HeadData.Mass = 0; % 0.05; 0.11(kg)
+HeadData.Active = true; 
+HeadData.Mass = 0.2; % 0.05; 0.11(kg)
 HeadData.Length = 30*1e-3; % 30; 20(m)
 HeadData.CoGOffset = HeadData.Length/2; % HeadData.Length/2; % 10*1e-3; %% (m)
 HeadData.Diam = 80*1e-03; % (m)
@@ -165,9 +167,9 @@ HeadData.E = 2.2*10^11; % (Pa)
 HeadData.Nu = 0.29; % (-)
 
 % Evaluation points for the ToolData free-free FRFs 
-InputRCSA.NodeP1 = 3; % 2; % 2nd node
+InputRCSA.NodeP1 = HeadData.NElem + 1; % 2nd node
 InputRCSA.DoFP1 = 3; % 3rd dof
-InputRCSA.NodeP2 = sum(ToolData.NElem) + HeadData.NElem + 1; % sum(ToolData.NElem) + HeadData.NElem + 1
+InputRCSA.NodeP2 = sum(ToolData.NElem) + HeadData.NElem + 1; % sum(ToolData.NElem) + HeadData.NElem + 1; % sum(ToolData.NElem) + HeadData.NElem + 1
 InputRCSA.DoFP2 = 3; % 3rd dof
 
 % Evaluation points for the restrained-tool FRFs
@@ -181,6 +183,18 @@ NumDoFNode = 3; % (fixed) number of degree of freedom in each node
 FigOpts.Xlim = [30 12000];
 FigOpts.Ylim = [0 5e-7];
 
+%% Check Input Data
+if ~HeadData.Active
+    HeadData.Mass = NaN; %(kg)
+    HeadData.Length = NaN; %(m)
+    HeadData.CoGOffset = NaN; %(m)
+    HeadData.Diam = NaN; %(m)
+    HeadData.NElem = 0; % Fix value. Don't modify
+    HeadData.Rho = NaN; % (kg/m^3)
+    HeadData.E = NaN; % (Pa)
+    HeadData.Nu = NaN; % (-)
+end
+
 %% Calculate Other Data
 % IRCSA | Long bar
 LongBarData.NElemTotal = sum(LongBarData.NElem); 
@@ -192,7 +206,11 @@ EvaluateIRCSA.idxP1 = EvaluateIRCSA.NodeP1*EvaluateIRCSA.DoFP1;
 EvaluateIRCSA.idxP2 = EvaluateIRCSA.NodeP2*EvaluateIRCSA.DoFP2; 
 
 % RCSA | ToolData 
-ToolData.NElemTotal = sum(ToolData.NElem) + HeadData.NElem; % total number of elements (tool + head)
+if HeadData.Active
+    ToolData.NElemTotal = sum(ToolData.NElem) + HeadData.NElem; % total number of elements (tool + head)
+else
+    ToolData.NElemTotal = sum(ToolData.NElem);
+end
 ToolData.NNode = ToolData.NElemTotal + 1;
 ToolData.NDOF = ToolData.NNode*NumDoFNode; % number of dgf
 

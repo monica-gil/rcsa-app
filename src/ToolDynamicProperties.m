@@ -1,4 +1,5 @@
 function ToolModel = ToolDynamicProperties(ToolData,HeadData)
+
 %% Information
 % Calculate M, K, C matrices of the tool + head system
 % The tool has a set of sections
@@ -33,7 +34,11 @@ function ToolModel = ToolDynamicProperties(ToolData,HeadData)
 
 %% Input Data
 NumToolSect = length(ToolData.Length);
-idxSectElem = [repmat(0,1,HeadData.NElem) NumToolSect];
+if HeadData.Active
+    idxSectElem = [repmat(0,1,HeadData.NElem) NumToolSect];
+else
+    idxSectElem = NumToolSect;
+end
 for idx = NumToolSect:-1:1
     idxSectElem = [idxSectElem repmat(idx,1,ToolData.NElem(idx))];
 end
@@ -47,7 +52,7 @@ ToolModel.M = zeros(ToolData.NDOF,ToolData.NDOF);
 ToolModel.K = zeros(ToolData.NDOF,ToolData.NDOF);
 
 for idxElem = 1:ToolData.NElemTotal
-    if idxElem <= HeadData.NElem
+    if HeadData.Active && idxElem <= HeadData.NElem
         E = HeadData.E; % tool head elements
         Rho = HeadData.Rho; % tool head elements
         Nu = HeadData.Nu; % tool head elements
@@ -69,8 +74,10 @@ for idxElem = 1:ToolData.NElemTotal
     ToolModel.K(idxDoFElem,idxDoFElem) = ToolModel.K(idxDoFElem,idxDoFElem) + KElement;
 end
 
-% Add mass and inertia of the toolhead in its gravity center
-ToolModel.M((HeadData.NElem*3-1),(HeadData.NElem*3-1)) = ToolModel.M((HeadData.NElem*3-1),(HeadData.NElem*3-1)) + HeadData.Mass;
+if HeadData.Active
+    % Add mass and inertia of the toolhead in its gravity center
+    ToolModel.M((HeadData.NElem*3-1),(HeadData.NElem*3-1)) = ToolModel.M((HeadData.NElem*3-1),(HeadData.NElem*3-1)) + HeadData.Mass;
+end
 
 % % C Matrix creation as proporcional damping
 % Mintegral = M(1:(ToolData.NElemTotal*3),1:(ToolData.NElemTotal*3));
